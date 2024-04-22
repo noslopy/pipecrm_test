@@ -24,12 +24,15 @@ export default () => {
     setRefreshRate(2000)
     const params = validatedParams()
     const url = "/api/v1/companies" + params;
-    console.log('call ' + url)
+    console.log('call ' + url) // left it here
     fetch(url)
       .then((res) => {
         return res.json();
       })
       .then((res) => setCompanies(res))
+      .catch(error => {
+        console.error({error: "There is an issue with the server, please try again later! Also write something for the user."})
+      });
   }
 
   function validatedParams () {
