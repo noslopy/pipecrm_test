@@ -9,16 +9,37 @@ export default () => {
   const [industry, setIndustry] = useState("");
   const [minEmployee, setMinEmployee] = useState("");
   const [minimumDealAmount, setMinimumDealAmount] = useState("");
+  const [refreshRate, setRefreshRate] = useState(0);
 
   // Fetch companies from API
   useEffect(() => {
-    const url = "/api/v1/companies";
+    const timer = setTimeout(() => {
+      runQuery()
+    }, refreshRate)
+
+    return () => clearTimeout(timer)
+  }, [companyName, industry, minEmployee, minimumDealAmount])
+
+  function runQuery () {
+    setRefreshRate(2000)
+    const params = validatedParams()
+    const url = "/api/v1/companies" + params;
+    console.log('call ' + url)
     fetch(url)
       .then((res) => {
         return res.json();
       })
       .then((res) => setCompanies(res))
-  }, [])
+  }
+
+  function validatedParams () {
+    const params = []
+    if (companyName.length >= 3) params.push('companyName='+companyName)
+    if (industry.length >= 3) params.push('industry='+industry)
+    if (minEmployee > 0) params.push('minEmployee='+minEmployee)
+    if (minimumDealAmount > 0) params.push('minimumDealAmount='+minimumDealAmount)
+    return params.length > 0 ? '?' + params.join('&') : ''
+  }
 
   return (
     <div className="vw-100 primary-color d-flex align-items-center justify-content-center">
@@ -38,12 +59,12 @@ export default () => {
 
           <label htmlFor="min-employee">Minimum Employee Count</label>
           <div className="input-group mb-3">
-            <input type="text" className="form-control" id="min-employee" value={minEmployee} onChange={e => setMinEmployee(e.target.value)} />
+            <input type="number" className="form-control" id="min-employee" value={minEmployee} onChange={e => setMinEmployee(e.target.value)} />
           </div>
 
           <label htmlFor="min-amount">Minimum Deal Amount</label>
           <div className="input-group mb-3">
-            <input type="text" className="form-control" id="min-amount" value={minimumDealAmount} onChange={e => setMinimumDealAmount(e.target.value)} />
+            <input type="number" className="form-control" id="min-amount" value={minimumDealAmount} onChange={e => setMinimumDealAmount(e.target.value)} />
           </div>
 
           <table className="table">
@@ -61,7 +82,7 @@ export default () => {
                   <td>{company.name}</td>
                   <td>{company.industry}</td>
                   <td>{company.employee_count}</td>
-                  <td>{company.deals.reduce((sum, deal) => sum + deal.amount, 0)}</td>
+                  <td>{company.total_amount}</td>
                 </tr>
               ))}
             </tbody>
