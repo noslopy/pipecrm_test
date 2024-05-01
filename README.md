@@ -28,6 +28,12 @@ Assumptions to make regarding the user story for this service:
 - `sudo docker compose build`
 - `sudo docker compose up`
 
+Enter the dev-env:
+- `sudo docker compose run app bash`
+
+Run tests:
+ - `RAILS_ENV=test rspec`
+
 #### Submission
 - Clone the repository
 - Setup a new repository with the source code
